@@ -16,8 +16,13 @@ const DoctorForm = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/doctors').then(res => setDoctors(res.data));
-    axios.get('http://localhost:4000/api/tests').then(res => setTests(res.data));
+    axios.get('https://lab-app-backend.onrender.com/api/doctors')
+      .then(res => setDoctors(res.data))
+      .catch(() => setDoctors([]));
+
+    axios.get('https://lab-app-backend.onrender.com/api/tests')
+      .then(res => setTests(res.data))
+      .catch(() => setTests([]));
   }, []);
 
   const addTest = (test) => {
@@ -35,11 +40,11 @@ const DoctorForm = () => {
     if (selectedTests.length === 0) return alert('Please add at least one test.');
 
     try {
-      const res = await axios.post('http://localhost:4000/api/doctor/submit', {
-        ...form,
-        tests: selectedTests
-      });
-      setMessage(res.data.message);
+      const res = await axios.post(
+        'https://lab-app-backend.onrender.com/api/doctor/submit',
+        { ...form, tests: selectedTests }
+      );
+      setMessage(res.data.message || 'Form submitted successfully!');
     } catch (err) {
       setMessage('Submission failed. Please try again.');
     }
@@ -54,7 +59,9 @@ const DoctorForm = () => {
       <form onSubmit={handleSubmit}>
         <select value={form.doctor} onChange={e => setForm({ ...form, doctor: e.target.value })} required>
           <option value="">Select Doctor</option>
-          {doctors.map(doc => <option key={doc}>{doc}</option>)}
+          {doctors.map((doc, idx) => (
+            <option key={idx} value={doc}>{doc}</option>
+          ))}
         </select>
 
         <input
@@ -92,7 +99,7 @@ const DoctorForm = () => {
           }}
         />
         <datalist id="testList">
-          {tests.map(test => <option key={test} value={test} />)}
+          {tests.map((test, idx) => <option key={idx} value={test} />)}
         </datalist>
 
         {selectedTests.length > 0 && (
