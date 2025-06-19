@@ -14,7 +14,9 @@ const LabForm = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/tests').then(res => setTests(res.data));
+    axios.get('https://lab-app-backend.onrender.com/api/tests')
+      .then(res => setTests(res.data))
+      .catch(() => setTests([]));
   }, []);
 
   const addTest = (name, price) => {
@@ -31,7 +33,7 @@ const LabForm = () => {
     e.preventDefault();
     if (testList.length === 0) return alert('Add at least one test');
 
-    const res = await fetch('http://localhost:4000/api/lab/submit', {
+    const res = await fetch('https://lab-app-backend.onrender.com/api/lab/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, tests: testList })
@@ -68,7 +70,7 @@ const LabForm = () => {
 
         <input list="labTestList" placeholder="Search Test" id="labTest" />
         <datalist id="labTestList">
-          {tests.map(test => <option key={test} value={test} />)}
+          {tests.map((test, idx) => <option key={idx} value={test} />)}
         </datalist>
 
         <input type="number" id="labTestPrice" placeholder="Test Price ₹" />
@@ -83,7 +85,7 @@ const LabForm = () => {
         <ul className="test-list">
           {testList.map(test => (
             <li key={test.name} className="test-item">
-              {test.name} - ₹{test.price} 
+              {test.name} - ₹{test.price}
               <button type="button" onClick={() => removeTest(test.name)}>❌</button>
             </li>
           ))}
