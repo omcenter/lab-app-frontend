@@ -12,7 +12,7 @@ const IndexPage = () => {
         <Link to="/lab" className="home-box">Lab</Link>
       </div>
 
-      <a href="https://wa.me/919990611114" target="_blank" className="whatsapp">💬</a>
+      <a href="https://wa.me/918882447570" target="_blank" className="whatsapp">💬</a>
     </div>
   );
 };
