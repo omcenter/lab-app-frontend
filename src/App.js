@@ -1,5 +1,4 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import IndexPage from './pages/IndexPage';
 import DoctorForm from './pages/DoctorForm';
 import AgentForm from './pages/AgentForm';
