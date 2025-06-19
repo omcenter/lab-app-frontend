@@ -5,13 +5,13 @@ import '../styles/style.css';
 const LabForm = () => {
   const [tests, setTests] = useState([]);
   const [testList, setTestList] = useState([]);
+  const [selectedTest, setSelectedTest] = useState('');
+  const [testPrice, setTestPrice] = useState('');
   const [form, setForm] = useState({
     patientName: '',
     address: '',
     phone: '',
-    lab: '',
-    testName: '',
-    testPrice: ''
+    lab: ''
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -20,8 +20,8 @@ const LabForm = () => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
       .then(res => {
         const rawTests = res.data.tests || res.data;
-        const names = rawTests.map(t => typeof t === 'string' ? t : t.name);
-        setTests(names);
+        const namesOnly = rawTests.map(t => typeof t === 'string' ? t : t.name);
+        setTests(namesOnly);
       })
       .catch(err => {
         console.error("Error fetching tests:", err);
@@ -30,13 +30,10 @@ const LabForm = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const addTest = () => {
-    const name = form.testName.trim();
-    const price = form.testPrice.trim();
+  const addTest = (name, price) => {
     if (!name || !price) return;
     if (testList.some(t => t.name === name)) return;
     setTestList([...testList, { name, price }]);
-    setForm({ ...form, testName: '', testPrice: '' });
   };
 
   const removeTest = (name) => {
@@ -50,13 +47,7 @@ const LabForm = () => {
     const res = await fetch('https://lab-app-backend.onrender.com/api/lab/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        patientName: form.patientName,
-        address: form.address,
-        phone: form.phone,
-        lab: form.lab,
-        tests: testList
-      })
+      body: JSON.stringify({ ...form, tests: testList })
     });
 
     if (res.ok) {
@@ -84,6 +75,7 @@ const LabForm = () => {
           onChange={e => setForm({ ...form, patientName: e.target.value })}
           required
         />
+
         <input
           type="text"
           placeholder="Patient Address"
@@ -91,6 +83,7 @@ const LabForm = () => {
           onChange={e => setForm({ ...form, address: e.target.value })}
           required
         />
+
         <input
           type="tel"
           placeholder="Phone Number"
@@ -98,6 +91,7 @@ const LabForm = () => {
           onChange={e => setForm({ ...form, phone: e.target.value })}
           required
         />
+
         <select
           value={form.lab}
           onChange={e => setForm({ ...form, lab: e.target.value })}
@@ -110,32 +104,46 @@ const LabForm = () => {
           <option>SRL</option>
         </select>
 
-        {/* ✅ Test input with datalist */}
+        {/* Searchable Test Input */}
         <input
           list="labTestList"
           placeholder="Search Test"
-          value={form.testName}
-          onChange={e => setForm({ ...form, testName: e.target.value })}
+          value={selectedTest}
+          onChange={e => setSelectedTest(e.target.value)}
+          required
         />
         <datalist id="labTestList">
-          {tests.map((test, i) => (
-            <option key={i} value={test} />
+          {tests.map((test, idx) => (
+            <option key={idx} value={test} />
           ))}
         </datalist>
 
+        {/* Price Input */}
         <input
           type="number"
           placeholder="Test Price ₹"
-          value={form.testPrice}
-          onChange={e => setForm({ ...form, testPrice: e.target.value })}
+          value={testPrice}
+          onChange={e => setTestPrice(e.target.value)}
+          required
         />
 
-        <button type="button" onClick={addTest}>Add Test</button>
+        {/* Add Button */}
+        <button
+          type="button"
+          onClick={() => {
+            addTest(selectedTest, testPrice);
+            setSelectedTest('');
+            setTestPrice('');
+          }}
+        >
+          Add Test
+        </button>
 
+        {/* Test List */}
         {testList.length > 0 && (
           <ul className="test-list">
             {testList.map(test => (
-              <li key={test.name}>
+              <li key={test.name} className="test-item">
                 {test.name} - ₹{test.price}
                 <button type="button" onClick={() => removeTest(test.name)}>❌</button>
               </li>
