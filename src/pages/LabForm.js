@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import '../styles/style.css';
 
@@ -13,6 +13,9 @@ const LabForm = () => {
     lab: ''
   });
   const [message, setMessage] = useState('');
+
+  const testNameRef = useRef();
+  const testPriceRef = useRef();
 
   useEffect(() => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
@@ -102,22 +105,22 @@ const LabForm = () => {
           <option>SRL</option>
         </select>
 
-        <input list="labTestList" placeholder="Search Test" id="labTest" />
+        <input list="labTestList" placeholder="Search Test" ref={testNameRef} />
         <datalist id="labTestList">
           {tests.map((test, idx) => (
             <option key={idx} value={test} />
           ))}
         </datalist>
 
-        <input type="number" id="labTestPrice" placeholder="Test Price ₹" />
+        <input type="number" placeholder="Test Price ₹" ref={testPriceRef} />
         <button
           type="button"
           onClick={() => {
-            const testName = document.getElementById('labTest').value;
-            const price = document.getElementById('labTestPrice').value;
+            const testName = testNameRef.current.value;
+            const price = testPriceRef.current.value;
             addTest(testName, price);
-            document.getElementById('labTest').value = '';
-            document.getElementById('labTestPrice').value = '';
+            testNameRef.current.value = '';
+            testPriceRef.current.value = '';
           }}
         >
           Add Test
