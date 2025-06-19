@@ -1,3 +1,4 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from 'react';
 import IndexPage from './pages/IndexPage';
 import DoctorForm from './pages/DoctorForm';
