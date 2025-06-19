@@ -22,18 +22,22 @@ const AgentForm = () => {
       .catch(() => setAgents([]));
 
     axios.get('https://lab-app-backend.onrender.com/api/tests')
-      .then(res => setTests(res.data))
+      .then(res => {
+        const raw = res.data.tests || res.data;
+        const names = raw.map(t => typeof t === 'string' ? t : t.name);
+        setTests(names);
+      })
       .catch(() => setTests([]));
   }, []);
 
-  const addTest = (test) => {
-    if (test && test.trim() !== '' && !selectedTests.includes(test)) {
-      setSelectedTests([...selectedTests, test.trim()]);
-    }
+  const addTest = (name, price) => {
+    if (!name || !price) return;
+    if (selectedTests.some(t => t.name === name)) return;
+    setSelectedTests([...selectedTests, { name, price }]);
   };
 
-  const removeTest = (test) => {
-    setSelectedTests(selectedTests.filter(t => t !== test));
+  const removeTest = (name) => {
+    setSelectedTests(selectedTests.filter(t => t.name !== name));
   };
 
   const handleSubmit = async (e) => {
@@ -95,27 +99,33 @@ const AgentForm = () => {
           onChange={e => setForm({ ...form, serial: e.target.value })}
         />
 
-        <input
-          list="testList"
-          placeholder="Search Test and press Enter"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addTest(e.target.value);
-              e.target.value = '';
-            }
+        <select id="agentTestSelect">
+          <option value="">Select Test</option>
+          {tests.map((test, idx) => (
+            <option key={idx} value={test}>{test}</option>
+          ))}
+        </select>
+
+        <input type="number" id="agentTestPrice" placeholder="Test Price ₹" />
+        <button
+          type="button"
+          onClick={() => {
+            const testName = document.getElementById('agentTestSelect').value;
+            const price = document.getElementById('agentTestPrice').value;
+            addTest(testName, price);
+            document.getElementById('agentTestSelect').value = '';
+            document.getElementById('agentTestPrice').value = '';
           }}
-        />
-        <datalist id="testList">
-          {tests.map((test, idx) => <option key={idx} value={test} />)}
-        </datalist>
+        >
+          Add Test
+        </button>
 
         {selectedTests.length > 0 && (
           <ul className="test-list">
             {selectedTests.map(test => (
-              <li key={test} className="test-item">
-                {test}
-                <button type="button" onClick={() => removeTest(test)}>❌</button>
+              <li key={test.name} className="test-item">
+                {test.name} - ₹{test.price}
+                <button type="button" onClick={() => removeTest(test.name)}>❌</button>
               </li>
             ))}
           </ul>
