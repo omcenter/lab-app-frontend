@@ -1,48 +1,64 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/style.css';
 
 const AgentForm = () => {
   const [agents, setAgents] = useState([]);
   const [tests, setTests] = useState([]);
-  const [testList, setTestList] = useState([]);
+  const [selectedTests, setSelectedTests] = useState([]);
   const [form, setForm] = useState({
     agent: '',
-    patientName: '',
     address: '',
     phone: '',
-    payment: '',
+    serial: '',
+    paymentMode: '',
     notes: ''
   });
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/agents').then(res => setAgents(res.data));
-    axios.get('http://localhost:4000/api/tests').then(res => setTests(res.data));
+    axios.get('https://lab-app-backend.onrender.com/api/agents')
+      .then(res => setAgents(res.data))
+      .catch(() => setAgents([]));
+
+    axios.get('https://lab-app-backend.onrender.com/api/tests')
+      .then(res => setTests(res.data))
+      .catch(() => setTests([]));
   }, []);
 
-  const addTest = (name, price) => {
-    if (!name || !price) return;
-    if (testList.some(t => t.name === name)) return;
-    setTestList([...testList, { name, price }]);
+  const addTest = (test) => {
+    if (test && test.trim() !== '' && !selectedTests.includes(test)) {
+      setSelectedTests([...selectedTests, test.trim()]);
+    }
   };
 
-  const removeTest = (name) => {
-    setTestList(testList.filter(t => t.name !== name));
+  const removeTest = (test) => {
+    setSelectedTests(selectedTests.filter(t => t !== test));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (testList.length === 0) return alert('Add at least one test');
+    if (selectedTests.length === 0) return alert('Please add at least one test.');
 
-    const res = await axios.post('http://localhost:4000/api/agent/submit', {
-      ...form,
-      tests: testList
+    try {
+      const res = await axios.post(
+        'https://lab-app-backend.onrender.com/api/agent/submit',
+        { ...form, tests: selectedTests }
+      );
+      setMessage(res.data.message || 'Form submitted successfully!');
+    } catch (err) {
+      setMessage('Submission failed. Please try again.');
+    }
+
+    setForm({
+      agent: '',
+      address: '',
+      phone: '',
+      serial: '',
+      paymentMode: '',
+      notes: ''
     });
-
-    setMessage(res.data.message);
-    setForm({ agent: '', patientName: '', address: '', phone: '', payment: '', notes: '' });
-    setTestList([]);
+    setSelectedTests([]);
   };
 
   return (
@@ -51,45 +67,73 @@ const AgentForm = () => {
       <form onSubmit={handleSubmit}>
         <select value={form.agent} onChange={e => setForm({ ...form, agent: e.target.value })} required>
           <option value="">Select Agent</option>
-          {agents.map(agent => <option key={agent}>{agent}</option>)}
+          {agents.map((a, idx) => (
+            <option key={idx} value={a}>{a}</option>
+          ))}
         </select>
 
-        <input type="text" placeholder="Patient Name" value={form.patientName} onChange={e => setForm({ ...form, patientName: e.target.value })} required />
-        <input type="text" placeholder="Patient Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required />
-        <input type="tel" placeholder="Patient Phone Number" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
+        <input
+          type="text"
+          placeholder="Patient Address"
+          value={form.address}
+          onChange={e => setForm({ ...form, address: e.target.value })}
+          required
+        />
 
-        <input list="testOptions" placeholder="Search Test" id="testSearch" />
-        <datalist id="testOptions">
-          {tests.map(test => <option key={test} value={test} />)}
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={form.phone}
+          onChange={e => setForm({ ...form, phone: e.target.value })}
+          required
+        />
+
+        <input
+          type="text"
+          placeholder="Serial Number"
+          value={form.serial}
+          onChange={e => setForm({ ...form, serial: e.target.value })}
+        />
+
+        <input
+          list="testList"
+          placeholder="Search Test and press Enter"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addTest(e.target.value);
+              e.target.value = '';
+            }
+          }}
+        />
+        <datalist id="testList">
+          {tests.map((test, idx) => <option key={idx} value={test} />)}
         </datalist>
 
-        <input type="number" id="testPrice" placeholder="Test Price ₹" />
-        <button type="button" onClick={() => {
-          const testName = document.getElementById('testSearch').value;
-          const price = document.getElementById('testPrice').value;
-          addTest(testName, price);
-          document.getElementById('testSearch').value = '';
-          document.getElementById('testPrice').value = '';
-        }}>Add Test</button>
+        {selectedTests.length > 0 && (
+          <ul className="test-list">
+            {selectedTests.map(test => (
+              <li key={test} className="test-item">
+                {test}
+                <button type="button" onClick={() => removeTest(test)}>❌</button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-        <ul className="test-list">
-          {testList.map(test => (
-            <li key={test.name} className="test-item">
-              {test.name} - ₹{test.price} 
-              <button type="button" onClick={() => removeTest(test.name)}>❌</button>
-            </li>
-          ))}
-        </ul>
-
-        <select value={form.payment} onChange={e => setForm({ ...form, payment: e.target.value })} required>
-          <option value="">Payment Mode</option>
+        <select value={form.paymentMode} onChange={e => setForm({ ...form, paymentMode: e.target.value })} required>
+          <option value="">Mode of Payment</option>
           <option>Cash</option>
           <option>UPI</option>
           <option>Card</option>
-          <option>Online</option>
         </select>
 
-        <textarea placeholder="Additional Notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}></textarea>
+        <textarea
+          placeholder="Additional Notes"
+          value={form.notes}
+          onChange={e => setForm({ ...form, notes: e.target.value })}
+        ></textarea>
+
         <button type="submit">Submit</button>
       </form>
 
