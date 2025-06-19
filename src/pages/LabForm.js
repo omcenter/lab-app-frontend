@@ -15,8 +15,16 @@ const LabForm = () => {
 
   useEffect(() => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
-      .then(res => setTests(res.data))
-      .catch(() => setTests([]));
+      .then(res => {
+        // 👇 Adjust this line to handle both raw array or { tests: [...] }
+        const loadedTests = res.data.tests || res.data;
+        setTests(loadedTests);
+        console.log("Loaded test list:", loadedTests); // optional debug
+      })
+      .catch(err => {
+        console.error("Error fetching tests:", err);
+        setTests([]);
+      });
   }, []);
 
   const addTest = (name, price) => {
