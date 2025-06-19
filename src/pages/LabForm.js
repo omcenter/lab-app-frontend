@@ -5,8 +5,6 @@ import '../styles/style.css';
 const LabForm = () => {
   const [tests, setTests] = useState([]);
   const [testList, setTestList] = useState([]);
-  const [selectedTest, setSelectedTest] = useState('');
-  const [testPrice, setTestPrice] = useState('');
   const [form, setForm] = useState({
     patientName: '',
     address: '',
@@ -14,7 +12,6 @@ const LabForm = () => {
     lab: ''
   });
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
@@ -22,18 +19,24 @@ const LabForm = () => {
         const rawTests = res.data.tests || res.data;
         const namesOnly = rawTests.map(t => typeof t === 'string' ? t : t.name);
         setTests(namesOnly);
+        console.log("Loaded test options:", namesOnly);
       })
       .catch(err => {
-        console.error("Error fetching tests:", err);
+        console.error("Error loading tests:", err);
         setTests([]);
-      })
-      .finally(() => setLoading(false));
+      });
   }, []);
 
-  const addTest = (name, price) => {
+  const addTest = () => {
+    const name = document.getElementById('labTest').value.trim();
+    const price = document.getElementById('labTestPrice').value.trim();
+
     if (!name || !price) return;
     if (testList.some(t => t.name === name)) return;
-    setTestList([...testList, { name, price }]);
+
+    setTestList(prev => [...prev, { name, price }]);
+    document.getElementById('labTest').value = '';
+    document.getElementById('labTestPrice').value = '';
   };
 
   const removeTest = (name) => {
@@ -44,22 +47,27 @@ const LabForm = () => {
     e.preventDefault();
     if (testList.length === 0) return alert('Add at least one test');
 
-    const res = await fetch('https://lab-app-backend.onrender.com/api/lab/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, tests: testList })
-    });
+    try {
+      const res = await fetch('https://lab-app-backend.onrender.com/api/lab/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, tests: testList })
+      });
 
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'receipt.pdf';
-      a.click();
-      setMessage('✅ PDF Receipt downloaded!');
-    } else {
-      setMessage('❌ Failed to generate PDF.');
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'receipt.pdf';
+        a.click();
+        setMessage('✅ PDF Receipt downloaded!');
+      } else {
+        setMessage('❌ Failed to generate PDF.');
+      }
+    } catch (err) {
+      console.error('Submit failed:', err);
+      setMessage('❌ Submission error occurred.');
     }
   };
 
@@ -75,7 +83,6 @@ const LabForm = () => {
           onChange={e => setForm({ ...form, patientName: e.target.value })}
           required
         />
-
         <input
           type="text"
           placeholder="Patient Address"
@@ -83,7 +90,6 @@ const LabForm = () => {
           onChange={e => setForm({ ...form, address: e.target.value })}
           required
         />
-
         <input
           type="tel"
           placeholder="Phone Number"
@@ -104,42 +110,27 @@ const LabForm = () => {
           <option>SRL</option>
         </select>
 
-        {/* Searchable Test Input */}
+        {/* Searchable test input using datalist */}
         <input
           list="labTestList"
+          id="labTest"
           placeholder="Search Test"
-          value={selectedTest}
-          onChange={e => setSelectedTest(e.target.value)}
-          required
         />
         <datalist id="labTestList">
           {tests.map((test, idx) => (
-            <option key={idx} value={test} />
+            <option key={idx} value={test}></option>
           ))}
         </datalist>
 
-        {/* Price Input */}
         <input
           type="number"
+          id="labTestPrice"
           placeholder="Test Price ₹"
-          value={testPrice}
-          onChange={e => setTestPrice(e.target.value)}
-          required
         />
-
-        {/* Add Button */}
-        <button
-          type="button"
-          onClick={() => {
-            addTest(selectedTest, testPrice);
-            setSelectedTest('');
-            setTestPrice('');
-          }}
-        >
+        <button type="button" onClick={addTest}>
           Add Test
         </button>
 
-        {/* Test List */}
         {testList.length > 0 && (
           <ul className="test-list">
             {testList.map(test => (
@@ -154,8 +145,6 @@ const LabForm = () => {
         <button type="submit">Generate Receipt</button>
       </form>
 
-      {loading && <p>Loading tests...</p>}
-      {!loading && tests.length === 0 && <p style={{ color: 'red' }}>⚠️ No tests loaded</p>}
       {message && <p className="success-message">{message}</p>}
     </div>
   );
