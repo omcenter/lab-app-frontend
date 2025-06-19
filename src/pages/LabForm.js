@@ -5,6 +5,7 @@ import '../styles/style.css';
 const LabForm = () => {
   const [tests, setTests] = useState([]);
   const [testList, setTestList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     patientName: '',
     address: '',
@@ -16,15 +17,15 @@ const LabForm = () => {
   useEffect(() => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
       .then(res => {
-        // 👇 Adjust this line to handle both raw array or { tests: [...] }
-        const loadedTests = res.data.tests || res.data;
-        setTests(loadedTests);
-        console.log("Loaded test list:", loadedTests); // optional debug
+        const rawTests = res.data.tests || res.data;
+        const namesOnly = rawTests.map(t => typeof t === 'string' ? t : t.name);
+        setTests(namesOnly);
       })
       .catch(err => {
         console.error("Error fetching tests:", err);
         setTests([]);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const addTest = (name, price) => {
@@ -54,21 +55,46 @@ const LabForm = () => {
       a.href = url;
       a.download = 'receipt.pdf';
       a.click();
-      setMessage('PDF Receipt downloaded!');
+      setMessage('✅ PDF Receipt downloaded!');
     } else {
-      setMessage('Failed to generate PDF.');
+      setMessage('❌ Failed to generate PDF.');
     }
   };
 
   return (
     <div className="form-container">
       <h2>Lab Receipt Generator</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Patient Name" value={form.patientName} onChange={e => setForm({ ...form, patientName: e.target.value })} required />
-        <input type="text" placeholder="Patient Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required />
-        <input type="tel" placeholder="Phone Number" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
 
-        <select value={form.lab} onChange={e => setForm({ ...form, lab: e.target.value })} required>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Patient Name"
+          value={form.patientName}
+          onChange={e => setForm({ ...form, patientName: e.target.value })}
+          required
+        />
+
+        <input
+          type="text"
+          placeholder="Patient Address"
+          value={form.address}
+          onChange={e => setForm({ ...form, address: e.target.value })}
+          required
+        />
+
+        <input
+          type="tel"
+          placeholder="Phone Number"
+          value={form.phone}
+          onChange={e => setForm({ ...form, phone: e.target.value })}
+          required
+        />
+
+        <select
+          value={form.lab}
+          onChange={e => setForm({ ...form, lab: e.target.value })}
+          required
+        >
           <option value="">Select Lab</option>
           <option>OM Diagnostic Center</option>
           <option>PathCare</option>
@@ -78,29 +104,41 @@ const LabForm = () => {
 
         <input list="labTestList" placeholder="Search Test" id="labTest" />
         <datalist id="labTestList">
-          {tests.map((test, idx) => <option key={idx} value={test} />)}
+          {tests.map((test, idx) => (
+            <option key={idx} value={test} />
+          ))}
         </datalist>
 
         <input type="number" id="labTestPrice" placeholder="Test Price ₹" />
-        <button type="button" onClick={() => {
-          const testName = document.getElementById('labTest').value;
-          const price = document.getElementById('labTestPrice').value;
-          addTest(testName, price);
-          document.getElementById('labTest').value = '';
-          document.getElementById('labTestPrice').value = '';
-        }}>Add Test</button>
+        <button
+          type="button"
+          onClick={() => {
+            const testName = document.getElementById('labTest').value;
+            const price = document.getElementById('labTestPrice').value;
+            addTest(testName, price);
+            document.getElementById('labTest').value = '';
+            document.getElementById('labTestPrice').value = '';
+          }}
+        >
+          Add Test
+        </button>
 
-        <ul className="test-list">
-          {testList.map(test => (
-            <li key={test.name} className="test-item">
-              {test.name} - ₹{test.price}
-              <button type="button" onClick={() => removeTest(test.name)}>❌</button>
-            </li>
-          ))}
-        </ul>
+        {testList.length > 0 && (
+          <ul className="test-list">
+            {testList.map(test => (
+              <li key={test.name} className="test-item">
+                {test.name} - ₹{test.price}
+                <button type="button" onClick={() => removeTest(test.name)}>❌</button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <button type="submit">Generate Receipt</button>
       </form>
+
+      {loading && <p>Loading tests...</p>}
+      {!loading && tests.length === 0 && <p style={{ color: 'red' }}>⚠️ No tests loaded</p>}
       {message && <p className="success-message">{message}</p>}
     </div>
   );
