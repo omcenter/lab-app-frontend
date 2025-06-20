@@ -4,6 +4,7 @@ import IndexPage from './pages/IndexPage';
 import DoctorForm from './pages/DoctorForm';
 import AgentForm from './pages/AgentForm';
 import LabForm from './pages/LabForm';
+import HomePage from './pages/HomePage';
 import './styles/style.css';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
     <Router>
       <div className="container">
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/" element={<IndexPage />} />
           <Route path="/doctor" element={<DoctorForm />} />
           <Route path="/agent" element={<AgentForm />} />
