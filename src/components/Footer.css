@@ -1,0 +1,16 @@
+.footer {
+  background: #003366;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  margin-top: 40px;
+}
+.footer a {
+  color: #00ffcc;
+  text-decoration: none;
+  display: block;
+  margin-top: 5px;
+}
