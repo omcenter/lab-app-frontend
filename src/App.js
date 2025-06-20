@@ -26,7 +26,7 @@ function App() {
           <Route path="/doctor" element={<DoctorForm />} />
           <Route path="/agent" element={<AgentForm />} />
           <Route path="/lab" element={<LabForm />} />
-          <Route path="/lab/upload" element={<LabUploadPage />} /> {/* ✅ Report upload page */}
+          <Route path="/lab/upload" element={<LabUploadPage />} />
         </Routes>
       </div>
     </Router>
