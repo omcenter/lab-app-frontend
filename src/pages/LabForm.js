@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/style.css';
+import { useNavigate } from 'react-router-dom'; // ✅ For navigating to upload page
 
 const LabForm = () => {
   const [tests, setTests] = useState([]);
@@ -15,6 +16,8 @@ const LabForm = () => {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('https://lab-app-backend.onrender.com/api/tests')
@@ -82,7 +85,6 @@ const LabForm = () => {
           <option>SRL</option>
         </select>
 
-        {/* Dropdown Test Selector */}
         <select value={selectedTest} onChange={e => setSelectedTest(e.target.value)} required>
           <option value="">Select Test</option>
           {tests.map((test, idx) => (
@@ -116,6 +118,19 @@ const LabForm = () => {
       {loading && <p>Loading tests...</p>}
       {!loading && tests.length === 0 && <p style={{ color: 'red' }}>⚠️ No tests loaded</p>}
       {message && <p className="success-message">{message}</p>}
+
+      {/* ✅ Upload Section */}
+      <div style={{ marginTop: '40px', textAlign: 'center' }}>
+        <h3>Already Have a Test Report?</h3>
+        <p>Upload the final test report and invoice here.</p>
+        <button
+          type="button"
+          onClick={() => navigate('/lab/upload')}
+          style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#003366', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '8px' }}
+        >
+          Upload Report
+        </button>
+      </div>
     </div>
   );
 };
