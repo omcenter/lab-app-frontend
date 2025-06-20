@@ -35,6 +35,7 @@ const HomePage = () => {
       {showWelcome && (
         <div className="welcome-animation">
           <h1>Welcome to Om Diagnostic Center</h1>
+          <p style={{ textAlign: 'center', marginBottom: '10px' }}>🕒 {time}</p>
         </div>
       )}
 
