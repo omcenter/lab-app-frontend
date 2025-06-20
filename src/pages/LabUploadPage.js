@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/style.css'; // ✅ make sure this exists
+import '../styles/style.css'; // Ensure this file exists
 
 const LabUploadPage = () => {
   const [form, setForm] = useState({
@@ -10,6 +10,7 @@ const LabUploadPage = () => {
   });
 
   const [uploading, setUploading] = useState(false);
+  const [links, setLinks] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -40,10 +41,13 @@ const LabUploadPage = () => {
         body: formData,
       });
 
-      const result = await res.text();
-      alert(result);
+      if (!res.ok) throw new Error('Upload failed');
+
+      const result = await res.json();
+      setLinks({ reportLink: result.reportLink, invoiceLink: result.invoiceLink });
+      alert(`✅ ${result.message}`);
     } catch (err) {
-      alert('Failed to upload. Please try again.');
+      alert('❌ Failed to upload. Please try again.');
       console.error(err);
     }
 
@@ -94,6 +98,18 @@ const LabUploadPage = () => {
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
       </form>
+
+      {links && (
+        <div style={{ marginTop: '20px' }}>
+          <h4>✅ Uploaded Links:</h4>
+          <p>
+            📄 Report: <a href={links.reportLink} target="_blank" rel="noreferrer">{links.reportLink}</a>
+          </p>
+          <p>
+            🧾 Invoice: <a href={links.invoiceLink} target="_blank" rel="noreferrer">{links.invoiceLink}</a>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
