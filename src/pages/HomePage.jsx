@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import { Link } from 'react-router-dom';
-
-const [time, setTime] = useState(new Date().toLocaleTimeString());
-
-useEffect(() => {
-  const timer = setInterval(() => {
-    setTime(new Date().toLocaleTimeString());
-  }, 1000);
-  return () => clearInterval(timer);
-}, []);
+import Footer from '../components/Footer';
 
 const HomePage = () => {
+  const [time, setTime] = useState(new Date().toLocaleTimeString()); // ✅ moved inside
   const [showWelcome, setShowWelcome] = useState(true);
   const [suggestion, setSuggestion] = useState({ name: '', phone: '', message: '' });
 
+  // ⏰ Live clock logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // 💥 Welcome animation timer
   useEffect(() => {
     const timer = setTimeout(() => setShowWelcome(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ Submit suggestion
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch('https://lab-app-backend.onrender.com/submit-suggestion', {
@@ -79,6 +82,8 @@ const HomePage = () => {
       >
         💬 Chat
       </a>
+
+      <Footer /> {/* Optional if you want persistent footer */}
     </div>
   );
 };
