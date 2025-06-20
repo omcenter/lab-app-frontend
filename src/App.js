@@ -5,10 +5,10 @@ import PatientDashboard from './pages/PatientDashboard';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import SalesmanDashboard from './pages/SalesmanDashboard';
-import IndexPage from './pages/IndexPage';
 import DoctorForm from './pages/DoctorForm';
 import AgentForm from './pages/AgentForm';
 import LabForm from './pages/LabForm';
+import LabUploadPage from './pages/LabUploadPage'; // ✅ Make sure this file exists
 import HomePage from './pages/HomePage';
 import './styles/style.css';
 
@@ -23,10 +23,10 @@ function App() {
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/salesman-dashboard" element={<SalesmanDashboard />} />
-          <Route path="/" element={<IndexPage />} />
           <Route path="/doctor" element={<DoctorForm />} />
           <Route path="/agent" element={<AgentForm />} />
           <Route path="/lab" element={<LabForm />} />
+          <Route path="/lab/upload" element={<LabUploadPage />} /> {/* ✅ Report upload page */}
         </Routes>
       </div>
     </Router>
