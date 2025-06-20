@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 
 const HomePage = () => {
-  const [time, setTime] = useState(new Date().toLocaleTimeString()); // ✅ moved inside
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [showWelcome, setShowWelcome] = useState(true);
   const [suggestion, setSuggestion] = useState({ name: '', phone: '', message: '' });
 
-  // ⏰ Live clock logic
+  // ⏰ Live clock
   useEffect(() => {
     const timer = setInterval(() => {
       setTime(new Date().toLocaleTimeString());
@@ -16,7 +16,7 @@ const HomePage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // 💥 Welcome animation timer
+  // 💥 Welcome animation
   useEffect(() => {
     const timer = setTimeout(() => setShowWelcome(false), 2000);
     return () => clearTimeout(timer);
@@ -29,7 +29,9 @@ const HomePage = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(suggestion),
-    }).then(() => alert('Suggestion submitted!'));
+    })
+      .then(() => alert('Suggestion submitted!'))
+      .catch(() => alert('Error submitting suggestion'));
     setSuggestion({ name: '', phone: '', message: '' });
   };
 
@@ -83,7 +85,7 @@ const HomePage = () => {
         💬 Chat
       </a>
 
-      <Footer /> {/* Optional if you want persistent footer */}
+      <Footer />
     </div>
   );
 };
