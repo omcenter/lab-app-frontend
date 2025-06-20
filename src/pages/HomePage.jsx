@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import { Link } from 'react-router-dom';
 
+const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+useEffect(() => {
+  const timer = setInterval(() => {
+    setTime(new Date().toLocaleTimeString());
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
+
 const HomePage = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [suggestion, setSuggestion] = useState({ name: '', phone: '', message: '' });
