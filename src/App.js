@@ -1,4 +1,5 @@
 import React from 'react';
+import PatientDownload from './components/PatientDownload';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PatientLogin from './pages/PatientLogin';
 import PatientDashboard from './pages/PatientDashboard';
@@ -10,6 +11,7 @@ import AgentForm from './pages/AgentForm';
 import LabForm from './pages/LabForm';
 import LabUploadPage from './pages/LabUploadPage'; // ✅ Make sure this file exists
 import HomePage from './pages/HomePage';
+import PatientDownload from './components/PatientDownload';
 import './styles/style.css';
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/patient" element={<PatientLogin />} />
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/download" element={<PatientDownload />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/salesman-dashboard" element={<SalesmanDashboard />} />
           <Route path="/doctor" element={<DoctorForm />} />
