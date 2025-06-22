@@ -4,11 +4,12 @@
   position: relative;
 }
 
+/* Hamburger Menu Button */
 .hamburger {
   position: fixed;
   top: 15px;
   left: 15px;
-  z-index: 1001;
+  z-index: 1101;
   background: #003366;
   color: white;
   border: none;
@@ -29,7 +30,7 @@
   top: 0;
   left: -250px;
   transition: left 0.3s ease;
-  z-index: 1000;
+  z-index: 1100;
 }
 
 .sidebar.open {
@@ -39,6 +40,7 @@
 .sidebar h2 {
   margin-bottom: 30px;
   font-size: 22px;
+  color: #ffffff;
 }
 
 .sidebar nav a {
@@ -54,9 +56,15 @@
   color: #ffcc00;
 }
 
+/* Main Content */
 .main-content {
   flex: 1;
   margin-left: 0;
   padding: 20px;
-  width: 100%;
+  transition: margin-left 0.3s ease;
+}
+
+/* Shift content when sidebar is open */
+.drawer-open .main-content {
+  margin-left: 220px;
 }
