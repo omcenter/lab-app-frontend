@@ -40,6 +40,8 @@ const HomePage = () => {
     <div className={`app-layout ${drawerOpen ? 'drawer-open' : ''}`}>
       {/* 🟦 Sidebar */}
       <div className={`sidebar ${drawerOpen ? 'open' : ''}`}>
+      <button className="hamburger" onClick={() => setDrawerOpen(!drawerOpen)}>☰</button>
+      <div className="main-content">...</div>
         <h2>Navigation</h2>
         <nav>
           <Link to="/doctor" onClick={() => setDrawerOpen(false)}>Doctor</Link>
@@ -49,8 +51,7 @@ const HomePage = () => {
         </nav>
       </div>
 
-      {/* ⏏️ Hamburger Button */}
-      <button className="hamburger" onClick={() => setDrawerOpen(!drawerOpen)}>☰</button>
+       
 
       {/* 🔷 Main Content */}
       <div className="main-content">
