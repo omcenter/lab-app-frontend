@@ -1,35 +1,42 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import Sidebar from './components/Sidebar'; // New sidebar component
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
 import PatientLogin from './pages/PatientLogin';
 import PatientDashboard from './pages/PatientDashboard';
-import LoginPage from './pages/LoginPage';
+import PatientDownload from './pages/PatientDownload';
 import AdminDashboard from './pages/AdminDashboard';
 import SalesmanDashboard from './pages/SalesmanDashboard';
 import DoctorForm from './pages/DoctorForm';
 import AgentForm from './pages/AgentForm';
 import LabForm from './pages/LabForm';
-import LabUploadPage from './pages/LabUploadPage'; // ✅ Make sure this file exists
-import HomePage from './pages/HomePage';
-import PatientDownload from './pages/PatientDownload';
+import LabUploadPage from './pages/LabUploadPage';
+
 import './styles/style.css';
 
 function App() {
   return (
     <Router>
-      <div className="container">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/patient" element={<PatientLogin />} />
-          <Route path="/patient-dashboard" element={<PatientDashboard />} />
-          <Route path="/patient/download" element={<PatientDownload />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/salesman-dashboard" element={<SalesmanDashboard />} />
-          <Route path="/doctor" element={<DoctorForm />} />
-          <Route path="/agent" element={<AgentForm />} />
-          <Route path="/lab" element={<LabForm />} />
-          <Route path="/lab/upload" element={<LabUploadPage />} />
-        </Routes>
+      <div className="flex min-h-screen">
+        <Sidebar />
+
+        <div className="flex-1 p-4 bg-gray-50">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/patient" element={<PatientLogin />} />
+            <Route path="/patient-dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/download" element={<PatientDownload />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/salesman-dashboard" element={<SalesmanDashboard />} />
+            <Route path="/doctor" element={<DoctorForm />} />
+            <Route path="/agent" element={<AgentForm />} />
+            <Route path="/lab" element={<LabForm />} />
+            <Route path="/lab/upload" element={<LabUploadPage />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );
