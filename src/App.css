@@ -1,7 +1,10 @@
+/* General App layout */
 .App {
-  text-align: center;
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
 }
 
+/* Optional: Logo if you ever include one */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -13,21 +16,76 @@
   }
 }
 
+/* Header style if needed */
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: #003366;
+  height: 50px;
+  width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding-left: 15px;
   color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
-.App-link {
-  color: #61dafb;
+/* Hamburger button */
+.hamburger {
+  background: #003366;
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 10px 16px;
+  border-radius: 0 0 8px 0;
+  cursor: pointer;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
 }
 
+/* Sidebar styles */
+.sidebar {
+  width: 220px;
+  background: #003366;
+  color: white;
+  padding: 20px;
+  position: fixed;
+  top: 50px; /* Adjust for header */
+  left: -250px;
+  height: 100%;
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar nav a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin: 15px 0;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+/* Main content spacing */
+.main-content {
+  margin-left: 0;
+  padding: 70px 20px 20px 20px;
+}
+
+/* Optional spinning animation if logo used */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
