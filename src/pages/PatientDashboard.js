@@ -1,39 +1,81 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+// ✅ Convert Google Drive view link to direct download
+function convertToDownloadLink(viewLink) {
+  const match = viewLink?.match(/[-\w]{25,}/);
+  return match ? `https://drive.google.com/uc?id=${match[0]}&export=download` : viewLink;
+}
+
 const PatientDashboard = () => {
   const [searchParams] = useSearchParams();
   const mobile = searchParams.get('mobile');
+
   const [tests, setTests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (mobile) {
-      fetch(`https://lab-app-backend.onrender.com/api/reports/${mobile}`)
-        .then(res => res.json())
-        .then(data => setTests(data))
-        .catch(err => console.error(err));
+    if (!mobile) {
+      setError("❌ No mobile number provided in the URL.");
+      setLoading(false);
+      return;
     }
+
+    fetch(`https://lab-app-backend.onrender.com/api/reports/${mobile}`)
+      .then(res => res.json())
+      .then(data => {
+        setTests(data);
+        setError('');
+      })
+      .catch(err => {
+        console.error(err);
+        setError("❌ Failed to load reports. Please try again later.");
+      })
+      .finally(() => setLoading(false));
   }, [mobile]);
 
   return (
-    <div style={{ padding: '30px' }}>
-      <h2>Welcome, Patient</h2>
-      <p>Mobile: {mobile}</p>
-      <h3>Your Test Reports</h3>
+    <div style={{ padding: '30px', maxWidth: '600px', margin: '0 auto' }}>
+      <h2 style={{ color: '#003366', marginBottom: '10px' }}>Welcome, Patient</h2>
+      <p><strong>Mobile:</strong> {mobile || 'Not provided'}</p>
+      <h3 style={{ marginTop: '20px' }}>Your Test Reports</h3>
 
-      {tests.length === 0 ? (
+      {loading ? (
+        <p>🔄 Loading reports...</p>
+      ) : error ? (
+        <p style={{ color: 'red' }}>{error}</p>
+      ) : tests.length === 0 ? (
         <p>No reports found.</p>
       ) : (
-        <ul>
+        <ul style={{ padding: 0, listStyle: 'none' }}>
           {tests.map((item, index) => (
-            <li key={index} style={{ marginBottom: '20px' }}>
-              <strong>Test:</strong> {item.testName}<br />
-              <strong>Date:</strong> {item.date}<br />
+            <li key={index} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '15px', borderRadius: '8px' }}>
+              <p><strong>Test:</strong> {item.testName}</p>
+              <p><strong>Date:</strong> {item.date}</p>
               {item.reportUrl && (
-                <a href={item.reportUrl} target="_blank" rel="noopener noreferrer">📄 Download Report</a>
-              )}<br />
+                <p>
+                  <a
+                    href={convertToDownloadLink(item.reportUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#007BFF', textDecoration: 'underline' }}
+                  >
+                    📄 Download Report
+                  </a>
+                </p>
+              )}
               {item.invoiceUrl && (
-                <a href={item.invoiceUrl} target="_blank" rel="noopener noreferrer">🧾 Download Invoice</a>
+                <p>
+                  <a
+                    href={convertToDownloadLink(item.invoiceUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#28a745', textDecoration: 'underline' }}
+                  >
+                    🧾 Download Invoice
+                  </a>
+                </p>
               )}
             </li>
           ))}
