@@ -1,41 +1,49 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import Papa from 'papaparse';
 
 const PatientDownload = () => {
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [results, setResults] = useState([]);
 
-  const handleDownload = async () => {
-    if (!mobile.trim()) return alert("Enter mobile number");
+  const handleSearch = async () => {
+    if (!mobile.trim()) {
+      alert("Enter mobile number");
+      return;
+    }
 
     setLoading(true);
     setMessage('');
+    setResults([]);
 
     try {
-      const res = await axios.get(`https://lab-app-backend.onrender.com/api/patient/reports?mobile=${mobile}`);
-      const { reportLink, invoiceLink } = res.data;
+      const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?output=csv'; // replace with your CSV URL
 
-      // Auto-download both files
-      triggerDownload(reportLink);
-      triggerDownload(invoiceLink);
+      Papa.parse(sheetUrl, {
+        download: true,
+        header: true,
+        complete: (data) => {
+          const matches = data.data.filter(row =>
+            row["Phone number"]?.trim() === mobile.trim()
+          );
 
-      setMessage("✅ Report & Invoice downloaded.");
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Report not found for this number.");
+          if (matches.length > 0) {
+            setResults(matches);
+            setMessage(`✅ Found ${matches.length} report(s).`);
+          } else {
+            setMessage("❌ No report found for this mobile number.");
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          setMessage("❌ Error reading the sheet.");
+        },
+        skipEmptyLines: true,
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const triggerDownload = (url) => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = '';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
@@ -51,14 +59,33 @@ const PatientDownload = () => {
       />
 
       <button
-        onClick={handleDownload}
+        onClick={handleSearch}
         disabled={loading}
         className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        {loading ? 'Fetching...' : 'Download Report'}
+        {loading ? 'Searching...' : 'Search Report'}
       </button>
 
       {message && <p className="text-center mt-3 text-sm text-gray-700">{message}</p>}
+
+      {results.length > 0 && (
+        <div className="mt-4">
+          {results.map((r, idx) => (
+            <div key={idx} className="mb-3 border p-3 rounded shadow-sm">
+              <p><strong>Patient:</strong> {r["Patient Name"]}</p>
+              <p><strong>Test:</strong> {r["Test Name"]} ({r["Test Date"]})</p>
+              <a
+                href={r["Direct Download Link"]}
+                className="text-blue-600 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                📥 Download Report
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
