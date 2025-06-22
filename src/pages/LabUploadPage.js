@@ -1,115 +1,26 @@
-import React, { useState } from 'react';
-import '../styles/style.css'; // Ensure this file exists
+import React from 'react';
 
 const LabUploadPage = () => {
-  const [form, setForm] = useState({
-    mobile: '',
-    testName: '',
-    report: null,
-    invoice: null,
-  });
-
-  const [uploading, setUploading] = useState(false);
-  const [links, setLinks] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!form.report || !form.invoice) {
-      return alert('Please upload both report and invoice.');
-    }
-
-    setUploading(true);
-
-    const formData = new FormData();
-    formData.append('mobile', form.mobile);
-    formData.append('testName', form.testName);
-    formData.append('report', form.report);
-    formData.append('invoice', form.invoice);
-
-    try {
-      const res = await fetch('https://lab-app-backend.onrender.com/api/upload-report', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error('Upload failed');
-
-      const result = await res.json();
-      setLinks({ reportLink: result.reportLink, invoiceLink: result.invoiceLink });
-      alert(`✅ ${result.message}`);
-    } catch (err) {
-      alert('❌ Failed to upload. Please try again.');
-      console.error(err);
-    }
-
-    setUploading(false);
-  };
-
   return (
-    <div className="form-container">
-      <h2>Upload Test Report</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Mobile Number</label>
-        <input
-          type="text"
-          name="mobile"
-          value={form.mobile}
-          onChange={handleChange}
-          required
-        />
+    <div className="p-6 max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold text-blue-800 text-center mb-4">
+        Upload Test Report
+      </h2>
+      <p className="text-center mb-6">
+        Please fill out the Google Form below to upload patient reports. The details will automatically sync with the download system.
+      </p>
 
-        <label>Test Name</label>
-        <input
-          type="text"
-          name="testName"
-          value={form.testName}
-          onChange={handleChange}
-          required
-        />
-
-        <label>Upload Report (PDF)</label>
-        <input
-          type="file"
-          name="report"
-          accept="application/pdf"
-          onChange={handleChange}
-          required
-        />
-
-        <label>Upload Invoice (PDF)</label>
-        <input
-          type="file"
-          name="invoice"
-          accept="application/pdf"
-          onChange={handleChange}
-          required
-        />
-
-        <button type="submit" disabled={uploading}>
-          {uploading ? 'Uploading...' : 'Upload'}
-        </button>
-      </form>
-
-      {links && (
-        <div style={{ marginTop: '20px' }}>
-          <h4>✅ Uploaded Links:</h4>
-          <p>
-            📄 Report: <a href={links.reportLink} target="_blank" rel="noreferrer">{links.reportLink}</a>
-          </p>
-          <p>
-            🧾 Invoice: <a href={links.invoiceLink} target="_blank" rel="noreferrer">{links.invoiceLink}</a>
-          </p>
-        </div>
-      )}
+      <div className="shadow-lg border rounded p-4 bg-white">
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSc_omc0WCyZ2XQKeW_bFHo75tNw6AjBR4P6chOG9bgYyU_NRQ/viewform?embedded=true"
+          width="100%"
+          height="800"
+          frameBorder="0"
+          title="Report Upload Form"
+        >
+          Loading…
+        </iframe>
+      </div>
     </div>
   );
 };
