@@ -10,7 +10,7 @@ import AgentForm from './pages/AgentForm';
 import LabForm from './pages/LabForm';
 import LabUploadPage from './pages/LabUploadPage'; // ✅ Make sure this file exists
 import HomePage from './pages/HomePage';
-import PatientDownload from './components/PatientDownload';
+import PatientDownload from './pages/PatientDownload';
 import './styles/style.css';
 
 function App() {
