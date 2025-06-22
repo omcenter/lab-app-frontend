@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 
 const HomePage = () => {
@@ -45,13 +44,6 @@ const HomePage = () => {
       )}
 
       <h2 className="headline">Welcome to Om Diagnostic Center</h2>
-
-      <div className="card-container">
-        <Link to="/doctor" className="card">Doctor</Link>
-        <Link to="/agent" className="card">Lab Agent</Link>
-        <Link to="/lab" className="card">Lab</Link>
-        <Link to="/patient" className="card">Patient</Link>
-      </div>
 
       <form className="suggestion-box" onSubmit={handleSubmit}>
         <h3>Suggestion Box</h3>
