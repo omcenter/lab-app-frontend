@@ -1,5 +1,4 @@
 import React from 'react';
-import PatientDownload from './components/PatientDownload';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PatientLogin from './pages/PatientLogin';
 import PatientDashboard from './pages/PatientDashboard';
