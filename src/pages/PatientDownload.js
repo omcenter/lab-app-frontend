@@ -75,7 +75,7 @@ const PatientDownload = () => {
               <p><strong>Patient:</strong> {r["Patient Name"]}</p>
               <p><strong>Test:</strong> {r["Test Name"]} ({r["Test Date"]})</p>
               <a
-                href={r["Direct Download Link"]}
+                href={r["Reports Upload"]}
                 className="text-blue-600 underline"
                 target="_blank"
                 rel="noopener noreferrer"
