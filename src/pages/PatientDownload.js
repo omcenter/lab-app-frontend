@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
+// 🔧 Convert Google Drive view link to direct download link
+function convertToDownloadLink(viewLink) {
+  const fileIdMatch = viewLink?.match(/[-\w]{25,}/);
+  if (fileIdMatch) {
+    const fileId = fileIdMatch[0];
+    return `https://drive.google.com/uc?id=${fileId}&export=download`;
+  }
+  return null;
+}
+
 const PatientDownload = () => {
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,11 +28,12 @@ const PatientDownload = () => {
     setResults([]);
 
     try {
-      const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRNVt3Mbily9Tz5g7UNm687nYYxZ4QHcr0Q2E5tZw_5N1VRjGHhe91MZ48ueZ33u2RnxT5QTkeQyXWf/pub?output=csv'; // replace with your CSV URL
+      const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRNVt3Mbily9Tz5g7UNm687nYYxZ4QHcr0Q2E5tZw_5N1VRjGHhe91MZ48ueZ33u2RnxT5QTkeQyXWf/pub?output=csv';
 
       Papa.parse(sheetUrl, {
         download: true,
         header: true,
+        skipEmptyLines: true,
         complete: (data) => {
           const matches = data.data.filter(row =>
             row["Phone number"]?.trim() === mobile.trim()
@@ -38,8 +49,7 @@ const PatientDownload = () => {
         error: (err) => {
           console.error(err);
           setMessage("❌ Error reading the sheet.");
-        },
-        skipEmptyLines: true,
+        }
       });
     } finally {
       setLoading(false);
@@ -75,7 +85,7 @@ const PatientDownload = () => {
               <p><strong>Patient:</strong> {r["Patient Name"]}</p>
               <p><strong>Test:</strong> {r["Test Name"]} ({r["Test Date"]})</p>
               <a
-                href={r["Reports Upload"]}
+                href={convertToDownloadLink(r["Reports Upload"])}
                 className="text-blue-600 underline"
                 target="_blank"
                 rel="noopener noreferrer"
